@@ -105,7 +105,7 @@ fn setup(
         //])),
     ];
 
-    let sun = meshes.add(Sphere::default().mesh().uv(32, 18));
+    let sun_mesh = meshes.add(Sphere::default().mesh().uv(32, 18));
 
     /* Disabling extrusions
     let extrusions = [
@@ -122,8 +122,8 @@ fn setup(
     /*Spawn in a Sun at 0,0,0 
         with no initial rotation
         Scale it to a large size*/
-    commands.spawn((
-        Mesh3d(sun),
+    let sun = commands.spawn((
+        Mesh3d(sun_mesh),
         MeshMaterial3d(sun_material),
         Transform::from_xyz(
             0.0,
@@ -143,7 +143,7 @@ fn setup(
             //)
         ),
         Shape,
-    ));
+    )).id();
     //moved the point light inside the Sun to mimic light emission
     commands.spawn((
         PointLight {
@@ -160,6 +160,7 @@ fn setup(
 
     for (i, shape) in shapes.into_iter().enumerate() {
         commands.spawn((
+            ChildOf(sun),
             Mesh3d(shape),
             MeshMaterial3d(debug_material.clone()),
             Transform::from_xyz(
