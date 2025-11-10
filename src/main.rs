@@ -87,7 +87,7 @@ fn setup(
         ..default()
     });
 
-    let shapes = [
+    let planets = [
         //meshes.add(Cuboid::default()),
         //meshes.add(Tetrahedron::default()),
         //meshes.add(Capsule3d::default()),
@@ -120,7 +120,7 @@ fn setup(
     */
 
     /*Spawn in a Sun at 0,0,0 
-        with no initial rotation
+        with pi/2 rotation so that poles are in the Z axis
         Scale it to a large size*/
     let sun = commands.spawn((
         Mesh3d(sun_mesh),
@@ -146,27 +146,26 @@ fn setup(
     )).id();
     //moved the point light inside the Sun to mimic light emission
     commands.spawn((
+        ChildOf(sun),
         PointLight {
             shadows_enabled: true,
             intensity: 10_000_000.,
-            range: 100.0,
+            range: 1000.0,
             shadow_depth_bias: 0.2,
             ..default()
         },
         Transform::from_xyz(0.0, 0.0, 0.0),
     ));
 
-    let num_shapes = shapes.len();
-
-    for (i, shape) in shapes.into_iter().enumerate() {
+    for (i, shape) in planets.into_iter().enumerate() {
         commands.spawn((
             ChildOf(sun),
             Mesh3d(shape),
             MeshMaterial3d(debug_material.clone()),
             Transform::from_xyz(
-                -SHAPES_X_EXTENT / 2. + i as f32 / (num_shapes - 1) as f32 * SHAPES_X_EXTENT,
-                2.0,
-                Z_EXTENT / 2.,
+                10.0+(i as f32*4.0),
+                0.0,
+                0.0,
             )
             .with_rotation(Quat::from_rotation_x(-PI / 4.)),
             Shape,
@@ -204,7 +203,7 @@ fn setup(
 
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0.0, 7., 14.0).looking_at(Vec3::new(0., 1., 0.), Vec3::Y),
+        Transform::from_xyz(0.0, 200., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
     ));
 
     #[cfg(not(target_arch = "wasm32"))]
