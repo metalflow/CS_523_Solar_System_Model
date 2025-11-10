@@ -19,7 +19,7 @@ use std::f32::consts::PI;
 use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
 use bevy::{
     asset::RenderAssetUsages,
-    //color::palettes::basic::SILVER,   //disabling estrusions
+    //color::palettes::basic::SILVER,   //disabled as its only used by extrusions at the moment
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
@@ -47,18 +47,43 @@ fn main() {
 #[derive(Component)]
 struct Shape;
 
+/* not needed?
+/// A Handle for textures to use images
+#[derive(Resource)]
+    struct MyTextureHandle(Handle<Image>);
+*/
+
 const SHAPES_X_EXTENT: f32 = 14.0;
 //const EXTRUSION_X_EXTENT: f32 = 16.0; //disbling extrusions
 const Z_EXTENT: f32 = 5.0;
 
 fn setup(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    /*pre-load assets into asset handler */
+    let sun_texture = asset_server.load("textures\\Solarsystemscope_texture_2k_sun.jpg");
+    //commands.insert_resource(MyTextureHandle(sun_texture));
+
     let debug_material = materials.add(StandardMaterial {
         base_color_texture: Some(images.add(uv_debug_texture())),
+        ..default()
+    });
+
+    let sun_material = materials.add(StandardMaterial {
+        //base_color: Color::srgb(1.0,1.0,1.0),
+        emissive_texture: Some(sun_texture),
+        //base_color_texture: Some(sun_texture),
+        emissive: LinearRgba {
+            red: 0.5,
+            green: 0.5,
+            blue: 0.5,
+            alpha: 1000.0,
+        },
+        alpha_mode:AlphaMode::Add,
         ..default()
     });
 
@@ -80,6 +105,8 @@ fn setup(
         //])),
     ];
 
+    let sun = meshes.add(Sphere::default().mesh().uv(32, 18));
+
     /* Disabling extrusions
     let extrusions = [
         meshes.add(Extrusion::new(Rectangle::default(), 1.)),
@@ -91,6 +118,43 @@ fn setup(
         meshes.add(Extrusion::new(Triangle2d::default(), 1.)),
     ];
     */
+
+    /*Spawn in a Sun at 0,0,0 
+        with no initial rotation
+        Scale it to a large size*/
+    commands.spawn((
+        Mesh3d(sun),
+        MeshMaterial3d(sun_material),
+        Transform::from_xyz(
+            0.0,
+            0.0,
+            0.0,
+        )
+        .with_rotation(
+            Quat::from_rotation_x(PI/2.0)
+        )
+        .with_scale(
+            //Transform::from_scale(
+                Vec3::new(
+                    10.0,
+                    10.0,
+                    10.0,
+                )
+            //)
+        ),
+        Shape,
+    ));
+    //moved the point light inside the Sun to mimic light emission
+    commands.spawn((
+        PointLight {
+            shadows_enabled: true,
+            intensity: 10_000_000.,
+            range: 100.0,
+            shadow_depth_bias: 0.2,
+            ..default()
+        },
+        Transform::from_xyz(0.0, 0.0, 0.0),
+    ));
 
     let num_shapes = shapes.len();
 
@@ -127,16 +191,7 @@ fn setup(
     }
     */
 
-    commands.spawn((
-        PointLight {
-            shadows_enabled: true,
-            intensity: 10_000_000.,
-            range: 100.0,
-            shadow_depth_bias: 0.2,
-            ..default()
-        },
-        Transform::from_xyz(8.0, 16.0, 8.0),
-    ));
+
 
     /* Disabling Ground Plane
     // ground plane
