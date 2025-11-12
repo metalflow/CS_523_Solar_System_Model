@@ -14,6 +14,7 @@
 //! `POLYGON_MODE_LINE` on the gpu.
 
 use std::f32::consts::PI;
+use std::path::{Path};
 
 #[cfg(not(target_arch = "wasm32"))]
 use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
@@ -47,16 +48,6 @@ fn main() {
 #[derive(Component)]
 struct Shape;
 
-/* not needed?
-/// A Handle for textures to use images
-#[derive(Resource)]
-    struct MyTextureHandle(Handle<Image>);
-*/
-
-const SHAPES_X_EXTENT: f32 = 14.0;
-//const EXTRUSION_X_EXTENT: f32 = 16.0; //disbling extrusions
-const Z_EXTENT: f32 = 5.0;
-
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -64,8 +55,9 @@ fn setup(
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    let texture_path = Path::new("textures/");
     /*pre-load assets into asset handler */
-    let sun_texture = asset_server.load("textures\\Solarsystemscope_texture_2k_sun.jpg");
+    let sun_texture = asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg")));
     //commands.insert_resource(MyTextureHandle(sun_texture));
 
     let debug_material = materials.add(StandardMaterial {
@@ -190,8 +182,6 @@ fn setup(
         ));
     }
     */
-
-
 
     /* Disabling Ground Plane
     // ground plane
