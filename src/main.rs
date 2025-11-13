@@ -155,11 +155,18 @@ fn setup(
             Mesh3d(shape),
             MeshMaterial3d(debug_material.clone()),
             Transform::from_xyz(
-                10.0+(i as f32*4.0),
+                2.0+(i as f32*2.0),
                 0.0,
                 0.0,
             )
-            .with_rotation(Quat::from_rotation_x(-PI / 4.)),
+            .with_rotation(Quat::from_rotation_x((-PI * (i as f32)/ 4.) ))
+            .with_scale(
+                Vec3::new(
+                    1.0 + (i as f32),
+                    1.0 + (i as f32),
+                    1.0 + (i as f32),
+                )
+            ),
             Shape,
         ));
     }
@@ -193,7 +200,7 @@ fn setup(
 
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0.0, 200., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
+        Transform::from_xyz(0.0, 100., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
     ));
 
     #[cfg(not(target_arch = "wasm32"))]
