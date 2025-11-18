@@ -55,6 +55,13 @@ fn setup(
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    let solar_system_center: Entity= commands.spawn(
+        Transform::from_xyz(
+            0.0,
+            0.0,
+            0.0,
+        )
+    ).id();
     let texture_path = Path::new("textures/");
     /*pre-load assets into asset handler */
     let sun_texture = asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg")));
@@ -115,6 +122,7 @@ fn setup(
         with pi/2 rotation so that poles are in the Z axis
         Scale it to a large size*/
     let sun = commands.spawn((
+        ChildOf(solar_system_center),
         Mesh3d(sun_mesh),
         MeshMaterial3d(sun_material),
         Transform::from_xyz(
@@ -151,15 +159,15 @@ fn setup(
 
     for (i, shape) in planets.into_iter().enumerate() {
         commands.spawn((
-            ChildOf(sun),
+            ChildOf(solar_system_center),
             Mesh3d(shape),
             MeshMaterial3d(debug_material.clone()),
             Transform::from_xyz(
-                2.0+(i as f32*2.0),
+                6.0+(i as f32*2.0),
                 0.0,
                 0.0,
             )
-            .with_rotation(Quat::from_rotation_x((-PI * (i as f32)/ 4.) ))
+            .with_rotation(Quat::from_rotation_x(-PI * (i as f32)/ 4. ))
             .with_scale(
                 Vec3::new(
                     1.0 + (i as f32),
@@ -200,7 +208,7 @@ fn setup(
 
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(0.0, 100., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
+        Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
     ));
 
     #[cfg(not(target_arch = "wasm32"))]
