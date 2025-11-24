@@ -220,8 +220,15 @@ fn animate_suns(mut query: Query<&mut Transform, With<Sun>>, time: Res<Time>) {
 }
 
 fn animate_planets(mut query: Query<&mut Transform, With<Planet>>, time: Res<Time>) {
-    for mut transform in &mut query {
+    for (mut transform) in &mut query {
         transform.rotate_y(time.delta_secs() / 4.);
+        transform.rotate_around(
+            Vec3::new(
+                    0.0,
+                    0.0,
+                    0.0,
+                ), 
+            Quat::from_rotation_y(time.delta_secs()));
     }
 }
 
