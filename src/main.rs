@@ -56,11 +56,11 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let solar_system_center: Entity= commands.spawn(
-        Transform::from_xyz(
+        (Transform::from_xyz(
             0.0,
             0.0,
             0.0,
-        )
+        ), Visibility::Inherited)
     ).id();
     let texture_path = Path::new("textures/");
     /*pre-load assets into asset handler */
