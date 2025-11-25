@@ -1,7 +1,6 @@
 use std::f32::consts::PI;
 use std::path::{Path};
-use rand::Rng;
-use rand::thread_rng;
+use rand::{Rng, rng};
 
 #[cfg(not(target_arch = "wasm32"))]
 use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
@@ -56,7 +55,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     //get a local RNG for randomizing
-    let mut rng = thread_rng();
+    let mut rng = rng();
 
     let solar_system_center: Entity= commands.spawn(
         (Transform::from_xyz(
@@ -181,8 +180,8 @@ fn setup(
                 )
             ),
             Planet {
-                orbital_speed: (PI as i8) * rng.gen_range(-2..2),
-                rotation_speed: (PI as i8) * rng.gen_range(-2..2),
+                orbital_speed: (PI as i8) * rng.random_range(-2..2),
+                rotation_speed: (PI as i8) * rng.random_range(-2..2),
             },
         ));
     }
