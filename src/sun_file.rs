@@ -11,7 +11,7 @@ use bevy::{
 #[derive(Component)]
 pub struct Sun {
     //should be a value from +2PI to -2PI
-    rotation_speed:i8,
+    rotation_speed:f32,
 }
 
 pub fn make_sun(commands: &mut Commands,
@@ -68,7 +68,7 @@ pub fn make_sun(commands: &mut Commands,
             //)
         ),
         Sun {
-            rotation_speed: (PI as i8) * rng.random_range(-2..2),
+            rotation_speed: PI * rng.random_range(-2.0..2.0),
         },
     )).id();
 
