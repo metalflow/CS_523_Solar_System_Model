@@ -25,6 +25,7 @@ fn main() {
                 planet_file::animate_planets,
                 #[cfg(not(target_arch = "wasm32"))]
                 toggle_wireframe,
+                limit_pan_system,
             ),
         )
         .run();
@@ -97,6 +98,18 @@ fn setup(
         },
     ));
 }
+
+
+fn limit_pan_system(mut query: Query<&mut Transform, With <PanOrbitCamera>>) {
+    for mut camera in query.iter_mut() {     
+        const MIN: f32 = -100.0;
+        const MAX: f32 = 100.0;
+        camera.translation.x=camera.translation.x.clamp(MIN, MAX);
+        camera.translation.y=camera.translation.y.clamp(MIN, MAX);
+        camera.translation.z=camera.translation.z.clamp(MIN, MAX);
+    }
+}
+
 
 #[cfg(not(target_arch = "wasm32"))]
 fn toggle_wireframe(
