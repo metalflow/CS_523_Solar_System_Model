@@ -69,6 +69,17 @@ pub fn make_planets(commands: &mut Commands,
         ..default()
     });
 
+    let num_planets =rng.random_range(2..=9);
+    let mut planets= Vec::new();
+    for current_planet in 1..=num_planets {
+        if current_planet % 2 == 0 {
+            planets.push(meshes.add(Sphere::default().mesh().ico(5).unwrap()));
+        } else {
+            planets.push(meshes.add(Sphere::default().mesh().uv(32, 18)));
+        }
+    }
+
+    /*
     let planets = [
         //meshes.add(Cuboid::default()),
         //meshes.add(Tetrahedron::default()),
@@ -86,6 +97,7 @@ pub fn make_planets(commands: &mut Commands,
         //    Vec3::new(0.0, 0.5, 0.0),
         //])),
     ];
+    */
 
     for (i, shape) in planets.into_iter().enumerate() {
         commands.spawn((
