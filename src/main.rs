@@ -1,5 +1,7 @@
 use std::f32::consts::PI;
 use std::path::{Path};
+use rand::Rng;
+use rand::thread_rng;
 
 #[cfg(not(target_arch = "wasm32"))]
 use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
@@ -32,11 +34,19 @@ fn main() {
 
 /// new marker component for Sun objects
 #[derive(Component)]
-struct Sun;
+struct Sun {
+    //should be a value from +2PI to -2PI
+    rotation_speed:i8,
+}
 
 /// new marker component for Planet Objects
 #[derive(Component)]
-struct Planet;
+struct Planet {
+    //should be a value from +2PI to -2PI
+    rotation_speed:i8,
+    //should be a value from +2PI to -2PI
+    orbital_speed:i8,
+}
 
 fn setup(
     mut commands: Commands,
@@ -45,6 +55,9 @@ fn setup(
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    //get a local RNG for randomizing
+    let mut rng = thread_rng();
+
     let solar_system_center: Entity= commands.spawn(
         (Transform::from_xyz(
             0.0,
@@ -132,7 +145,9 @@ fn setup(
                 )
             //)
         ),
-        Sun,
+        Sun {
+            rotation_speed: PI as i8,
+        },
     )).id();
     //moved the point light inside the Sun to mimic light emission
     commands.spawn((
@@ -165,7 +180,10 @@ fn setup(
                     1.0 + (i as f32),
                 )
             ),
-            Planet,
+            Planet {
+                orbital_speed: (PI as i8) * rng.gen_range(-2..2),
+                rotation_speed: (PI as i8) * rng.gen_range(-2..2),
+            },
         ));
     }
 
@@ -219,16 +237,16 @@ fn animate_suns(mut query: Query<&mut Transform, With<Sun>>, time: Res<Time>) {
     }
 }
 
-fn animate_planets(mut query: Query<&mut Transform, With<Planet>>, time: Res<Time>) {
-    for (mut transform) in &mut query {
-        transform.rotate_y(time.delta_secs() / 4.);
+fn animate_planets(mut query: Query<(&mut Transform, &Planet)>, time: Res<Time>) {
+    for (mut transform, this_planet) in &mut query {
+        transform.rotate_y(time.delta_secs() * (this_planet.rotation_speed as f32));
         transform.rotate_around(
             Vec3::new(
                     0.0,
                     0.0,
                     0.0,
                 ), 
-            Quat::from_rotation_y(time.delta_secs()));
+            Quat::from_rotation_y(time.delta_secs() * (this_planet.orbital_speed as f32)));
     }
 }
 
