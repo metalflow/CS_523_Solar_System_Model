@@ -12,17 +12,17 @@ use bevy::{
 #[derive(Component)]
 pub struct Planet {
     //should be a value from +2PI to -2PI
-    rotation_speed:i8,
+    rotation_speed:f32,
     //should be a value from +2PI to -2PI
-    orbital_speed:i8,
+    orbital_speed:f32,
 }
 
 /// orbital speed of zero should be disallowed, thus I need to make this little function to avoid it
-fn compute_orbital_speed(min:i8,max:i8) -> i8 {
+fn compute_orbital_speed(min:i8,max:i8) -> f32 {
     let mut rng = rng();
-    let mut output = 0;
-    while output == 0 {
-        output = (PI as i8) * rng.random_range(min..=max)
+    let mut output:f32 = 0.0;
+    while output == 0.0 {
+        output = PI * rng.random_range((min as f32)..=(max as f32))
     }
     return output;
 }
@@ -119,7 +119,7 @@ pub fn make_planets(commands: &mut Commands,
             ),
             Planet {
                 orbital_speed: compute_orbital_speed(-1,1),
-                rotation_speed: (PI as i8) * rng.random_range(-2..2),
+                rotation_speed: PI * rng.random_range(-2.0..2.0),
             },
         ));
     }
