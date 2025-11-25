@@ -20,7 +20,8 @@ pub fn make_sun(commands: &mut Commands,
     //images: &mut ResMut<Assets<Image>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     solar_system_center: Entity,
-) {
+) -> u32 {
+    let mut solar_radius: u32=0;
     let mut rng = rng();
     let texture_path = Path::new("textures/");
     /*pre-load assets into asset handler */
@@ -72,6 +73,9 @@ pub fn make_sun(commands: &mut Commands,
         },
     )).id();
 
+    //just a fixed set here for now until I figure out how to dynamically assign this
+    solar_radius=10;
+
     //moved the point light inside the Sun to mimic light emission
     commands.spawn((
         ChildOf(id),
@@ -84,6 +88,7 @@ pub fn make_sun(commands: &mut Commands,
         },
         Transform::from_xyz(0.0, 0.0, 0.0),
     ));
+    return solar_radius;
 }
 
 pub fn animate_suns(mut query: Query<(&mut Transform, &Sun)>, time: Res<Time>) {

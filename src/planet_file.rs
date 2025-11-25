@@ -62,7 +62,10 @@ pub fn make_planets(commands: &mut Commands,
     images: &mut ResMut<Assets<Image>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     solar_system_center: Entity,
-) {
+    radius: u32,
+) -> u32 {
+    let mut new_radius:f32=radius as f32;
+    let mut scaling_factor: f32=1.0;
     let mut rng = rng();
     let debug_material = materials.add(StandardMaterial {
         base_color_texture: Some(images.add(uv_debug_texture())),
@@ -71,6 +74,7 @@ pub fn make_planets(commands: &mut Commands,
 
     let num_planets: u8 =rng.random_range(2..=9);
     let mut planets= Vec::new();
+
     for current_planet in 1..=num_planets {
         if current_planet % 2 == 0 {
             planets.push(meshes.add(Sphere::default().mesh().ico(5).unwrap()));
@@ -79,42 +83,25 @@ pub fn make_planets(commands: &mut Commands,
         }
     }
 
-    /*
-    let planets = [
-        //meshes.add(Cuboid::default()),
-        //meshes.add(Tetrahedron::default()),
-        //meshes.add(Capsule3d::default()),
-        //meshes.add(Torus::default()),
-        //meshes.add(Cylinder::default()),
-        //meshes.add(Cone::default()),
-        //meshes.add(ConicalFrustum::default()),
-        meshes.add(Sphere::default().mesh().ico(5).unwrap()),
-        meshes.add(Sphere::default().mesh().uv(32, 18)),
-        //meshes.add(Segment3d::default()),
-        //meshes.add(Polyline3d::new(vec![
-        //    Vec3::new(-0.5, 0.0, 0.0),
-        //    Vec3::new(0.5, 0.0, 0.0),
-        //    Vec3::new(0.0, 0.5, 0.0),
-        //])),
-    ];
-    */
-
     for (i, shape) in planets.into_iter().enumerate() {
+        scaling_factor+=1.0;
+        //inital radius growth of scaling factor to place center of new planet
+        new_radius+=scaling_factor;
         commands.spawn((
             ChildOf(solar_system_center),
             Mesh3d(shape),
             MeshMaterial3d(debug_material.clone()),
             Transform::from_xyz(
-                6.0+(i as f32*2.0),
+                new_radius,
                 0.0,
                 0.0,
             )
             .with_rotation(Quat::from_rotation_x(-PI * (i as f32)/ 4. ))
             .with_scale(
                 Vec3::new(
-                    1.0 + (i as f32),
-                    1.0 + (i as f32),
-                    1.0 + (i as f32),
+                    1.0 + scaling_factor,
+                    1.0 + scaling_factor,
+                    1.0 + scaling_factor,
                 )
             ),
             Planet {
@@ -122,8 +109,11 @@ pub fn make_planets(commands: &mut Commands,
                 rotation_speed: PI * rng.random_range(-2.0..2.0),
             },
         ));
+        //final radius growth of scaling factor to account for the rest of the planet
+        new_radius+=scaling_factor;
     }
 
+    return new_radius as u32;
 }
 
 pub fn animate_planets(mut query: Query<(&mut Transform, &Planet)>, time: Res<Time>) {

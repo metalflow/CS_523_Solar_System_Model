@@ -1,6 +1,7 @@
 
 #[cfg(not(target_arch = "wasm32"))]
 use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
+use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy::{
     prelude::*,
 };
@@ -14,6 +15,7 @@ fn main() {
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             #[cfg(not(target_arch = "wasm32"))]
             WireframePlugin::default(),
+            PanOrbitCameraPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(
@@ -35,6 +37,9 @@ fn setup(
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    // for keeping track of the "edge" of our solar system during creation
+    let mut radius: u32=0;
+
     let solar_system_center: Entity= commands.spawn(
         (Transform::from_xyz(
             0.0,
@@ -43,7 +48,7 @@ fn setup(
         ), Visibility::Inherited)
     ).id();
     
-    sun_file::make_sun (
+    radius += sun_file::make_sun (
         &mut commands,
         &asset_server,
         &mut meshes,
@@ -59,6 +64,7 @@ fn setup(
         &mut images,
         &mut materials,
         solar_system_center,
+        radius,
     );
 
     /* Disabling Ground Plane
@@ -69,9 +75,15 @@ fn setup(
     ));
     */
 
+    /* replacing old camera with a movable camera
     commands.spawn((
         Camera3d::default(),
         Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
+    ));
+    */
+    commands.spawn((
+        Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
+        PanOrbitCamera::default(),
     ));
 
     #[cfg(not(target_arch = "wasm32"))]
