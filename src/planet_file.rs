@@ -69,7 +69,7 @@ pub fn make_planets(commands: &mut Commands,
         ..default()
     });
 
-    let num_planets =rng.random_range(2..=9);
+    let num_planets: u8 =rng.random_range(2..=9);
     let mut planets= Vec::new();
     for current_planet in 1..=num_planets {
         if current_planet % 2 == 0 {
