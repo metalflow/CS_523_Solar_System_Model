@@ -47,14 +47,14 @@ fn setup(
         &mut commands,
         &asset_server,
         &mut meshes,
-        &mut images,
+        //&mut images,
         &mut materials,
         solar_system_center,
     );
 
     planet_file::make_planets (
         &mut commands,
-        &asset_server,
+        //&asset_server,
         &mut meshes,
         &mut images,
         &mut materials,

@@ -17,7 +17,7 @@ pub struct Sun {
 pub fn make_sun(commands: &mut Commands,
     asset_server: &Res<AssetServer>,
     meshes: &mut ResMut<Assets<Mesh>>,
-    images: &mut ResMut<Assets<Image>>,
+    //images: &mut ResMut<Assets<Image>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     solar_system_center: Entity,
 ) {

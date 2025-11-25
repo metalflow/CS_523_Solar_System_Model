@@ -1,10 +1,9 @@
 use std::f32::consts::PI;
-use rand::{Rng, rng, rngs::ThreadRng};
+use rand::{Rng, rng};
 
 ///bevy libraries
 use bevy::{
     asset::RenderAssetUsages,
-    //color::palettes::basic::SILVER,   //disabled as its only used by extrusions at the moment
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
@@ -19,8 +18,8 @@ pub struct Planet {
 }
 
 /// orbital speed of zero should be disallowed, thus I need to make this little function to avoid it
-fn compute_orbital_speed(min:i8,max:i8,rng: &mut ThreadRng) -> i8 {
-    ///let mut rng = rng();
+fn compute_orbital_speed(min:i8,max:i8) -> i8 {
+    let mut rng = rng();
     let mut output = 0;
     while output == 0 {
         output = (PI as i8) * rng.random_range(min..=max)
@@ -58,7 +57,7 @@ fn uv_debug_texture() -> Image {
 }
 
 pub fn make_planets(commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
+    //asset_server: &Res<AssetServer>,
     meshes: &mut ResMut<Assets<Mesh>>,
     images: &mut ResMut<Assets<Image>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
@@ -107,7 +106,7 @@ pub fn make_planets(commands: &mut Commands,
                 )
             ),
             Planet {
-                orbital_speed: compute_orbital_speed(-1,1,&mut rng),
+                orbital_speed: compute_orbital_speed(-1,1),
                 rotation_speed: (PI as i8) * rng.random_range(-2..2),
             },
         ));
