@@ -11,6 +11,32 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 
+/// new marker component for Sun objects
+#[derive(Component)]
+struct Sun {
+    //should be a value from +2PI to -2PI
+    rotation_speed:i8,
+}
+
+/// new marker component for Planet Objects
+#[derive(Component)]
+struct Planet {
+    //should be a value from +2PI to -2PI
+    rotation_speed:i8,
+    //should be a value from +2PI to -2PI
+    orbital_speed:i8,
+}
+
+/// orbital speed of zero should be disallowed, thus I need to make this little function to avoid it
+fn compute_orbital_speed(min:i8,max:i8) -> i8 {
+    let mut rng = rng();
+    let mut output = 0;
+    while (output == 0) {
+        output = (PI as i8) * rng.random_range(min..=max)
+    }
+    return output;
+}
+
 fn main() {
     App::new()
         .add_plugins((
@@ -29,22 +55,6 @@ fn main() {
             ),
         )
         .run();
-}
-
-/// new marker component for Sun objects
-#[derive(Component)]
-struct Sun {
-    //should be a value from +2PI to -2PI
-    rotation_speed:i8,
-}
-
-/// new marker component for Planet Objects
-#[derive(Component)]
-struct Planet {
-    //should be a value from +2PI to -2PI
-    rotation_speed:i8,
-    //should be a value from +2PI to -2PI
-    orbital_speed:i8,
 }
 
 fn setup(
@@ -145,7 +155,7 @@ fn setup(
             //)
         ),
         Sun {
-            rotation_speed: PI as i8,
+            rotation_speed: (PI as i8) * rng.random_range(-2..2),
         },
     )).id();
     //moved the point light inside the Sun to mimic light emission
@@ -180,7 +190,7 @@ fn setup(
                 )
             ),
             Planet {
-                orbital_speed: (PI as i8) * rng.random_range(-2..2),
+                orbital_speed: compute_orbital_speed(-1,1),
                 rotation_speed: (PI as i8) * rng.random_range(-2..2),
             },
         ));
@@ -230,9 +240,9 @@ fn setup(
     ));
 }
 
-fn animate_suns(mut query: Query<&mut Transform, With<Sun>>, time: Res<Time>) {
-    for mut transform in &mut query {
-        transform.rotate_y(time.delta_secs() / 2.);
+fn animate_suns(mut query: Query<(&mut Transform, &Sun)>, time: Res<Time>) {
+    for (mut transform, this_sun) in &mut query {
+        transform.rotate_y(time.delta_secs() * (this_sun.rotation_speed as f32));
     }
 }
 
