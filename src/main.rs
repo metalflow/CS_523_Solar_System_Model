@@ -31,7 +31,7 @@ struct Planet {
 fn compute_orbital_speed(min:i8,max:i8) -> i8 {
     let mut rng = rng();
     let mut output = 0;
-    while (output == 0) {
+    while output == 0 {
         output = (PI as i8) * rng.random_range(min..=max)
     }
     return output;
