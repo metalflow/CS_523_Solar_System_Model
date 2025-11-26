@@ -4,6 +4,7 @@ use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy::{
     prelude::*,
+    //transform::TransformSystems,
 };
 
 mod sun_file;
@@ -25,9 +26,10 @@ fn main() {
                 planet_file::animate_planets,
                 #[cfg(not(target_arch = "wasm32"))]
                 toggle_wireframe,
-                limit_pan_system,
+                //limit_pan_system, //disabled due to improper behavior
             ),
         )
+        //.add_systems(Update, limit_pan_system.after(TransformSystems::Propagate)) //disabled due to improper behavior
         .run();
 }
 
@@ -99,7 +101,11 @@ fn setup(
     ));
 }
 
-
+/*This function doesn't appear to actually update the transform for the camera
+ it will pop the camera to an appropriate value, but when you resume moving,
+ it pops back to the original bad value and moves relative to that.  There
+ must be some stored value in the move/pan function that is still holding
+ the bad value.  GitHub request added.
 fn limit_pan_system(mut query: Query<&mut Transform, With <PanOrbitCamera>>) {
     for mut camera in query.iter_mut() {     
         const MIN: f32 = -100.0;
@@ -109,7 +115,7 @@ fn limit_pan_system(mut query: Query<&mut Transform, With <PanOrbitCamera>>) {
         camera.translation.z=camera.translation.z.clamp(MIN, MAX);
     }
 }
-
+*/
 
 #[cfg(not(target_arch = "wasm32"))]
 fn toggle_wireframe(

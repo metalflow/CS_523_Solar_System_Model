@@ -5,6 +5,7 @@ use rand::{Rng, rng};
 ///bevy libraries
 use bevy::{
     prelude::*,
+    asset::LoadedFolder,
 };
 
 /// new marker component for Sun objects
@@ -13,6 +14,8 @@ pub struct Sun {
     //should be a value from +2PI to -2PI
     rotation_speed:f32,
 }
+#[derive(Resource, Default)]
+struct SunTextureFolder(Handle<LoadedFolder>);
 
 pub fn make_sun(commands: &mut Commands,
     asset_server: &Res<AssetServer>,
@@ -21,11 +24,15 @@ pub fn make_sun(commands: &mut Commands,
     materials: &mut ResMut<Assets<StandardMaterial>>,
     solar_system_center: Entity,
 ) -> u32 {
-    let mut solar_radius: u32=0;
+    let mut solar_radius: u32 = 0;
     let mut rng = rng();
-    let texture_path = Path::new("textures/");
+    let texture_path = Path::new("textures/sun/");
+    //experiment with loading all textures
+    let textures = asset_server.load_folder(texture_path); //loads assets as Vec<Handle<UnTyped>> which is no good
+    asset_server.get_asset(textures).into_iter().filter_map(|handle| {Some(handle.typed::<Image>())}).collect(); //iterates over all Vec<Handle<Untyped>> and converts to Vec<Handle<Image>>
+    let sun_texture=textures[0];
     /*pre-load assets into asset handler */
-    let sun_texture = asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg")));
+    //let sun_texture = asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg")));
     //commands.insert_resource(MyTextureHandle(sun_texture));
 
     let sun_material = materials.add(StandardMaterial {
@@ -38,7 +45,7 @@ pub fn make_sun(commands: &mut Commands,
             blue: 0.5,
             alpha: 1000.0,
         },
-        alpha_mode:AlphaMode::Add,
+        alpha_mode:AlphaMode::Opaque,
         ..default()
     });
 
@@ -74,7 +81,7 @@ pub fn make_sun(commands: &mut Commands,
     )).id();
 
     //just a fixed set here for now until I figure out how to dynamically assign this
-    solar_radius=10;
+    solar_radius+=10;
 
     //moved the point light inside the Sun to mimic light emission
     commands.spawn((
