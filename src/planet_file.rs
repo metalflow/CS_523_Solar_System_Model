@@ -108,7 +108,7 @@ pub fn make_planets(commands: &mut Commands,
 
     for (i, shape) in planets.into_iter().enumerate() {
         scaling_factor+=1.0;
-        let planet_texture_number = rng.random_range(0..=planet_textures.len());
+        let planet_texture_number = rng.random_range(0..planet_textures.len());
         //inital radius growth of scaling factor to place center of new planet
         new_radius+=scaling_factor;
         commands.spawn((
