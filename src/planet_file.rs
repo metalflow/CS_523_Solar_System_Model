@@ -1,5 +1,6 @@
 use std::f32::consts::PI;
 use rand::{Rng, rng};
+use std::path::{Path};
 
 ///bevy libraries
 use bevy::{
@@ -57,7 +58,7 @@ fn uv_debug_texture() -> Image {
 }
 
 pub fn make_planets(commands: &mut Commands,
-    //asset_server: &Res<AssetServer>,
+    asset_server: &Res<AssetServer>,
     meshes: &mut ResMut<Assets<Mesh>>,
     images: &mut ResMut<Assets<Image>>,
     materials: &mut ResMut<Assets<StandardMaterial>>,
@@ -67,10 +68,32 @@ pub fn make_planets(commands: &mut Commands,
     let mut new_radius:f32=radius as f32;
     let mut scaling_factor: f32=1.0;
     let mut rng = rng();
-    let debug_material = materials.add(StandardMaterial {
+    let texture_path = Path::new("textures/planet/");
+
+    /*pre-load assets into asset handler */
+    let mut planet_textures:Vec<Handle<Image>> = Vec::new();
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("2k_neptune.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("2k_uranus.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_ceres_fictional.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_eris_fictional.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_haumea_fictional.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_makemake_fictional.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_venus_atmosphere.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_earth_clouds.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_earth_daymap.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_earth_nightmap.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_jupiter.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_mars.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_mercury.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_moon.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_saturn.jpg"))));
+    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_venus_surface.jpg"))));
+
+    let _debug_material = materials.add(StandardMaterial {
         base_color_texture: Some(images.add(uv_debug_texture())),
         ..default()
     });
+
 
     let num_planets: u8 =rng.random_range(2..=9);
     let mut planets= Vec::new();
@@ -85,12 +108,17 @@ pub fn make_planets(commands: &mut Commands,
 
     for (i, shape) in planets.into_iter().enumerate() {
         scaling_factor+=1.0;
+        let planet_texture_number = rng.random_range(0..=planet_textures.len());
         //inital radius growth of scaling factor to place center of new planet
         new_radius+=scaling_factor;
         commands.spawn((
             ChildOf(solar_system_center),
             Mesh3d(shape),
-            MeshMaterial3d(debug_material.clone()),
+            //MeshMaterial3d(debug_material.clone()),
+            MeshMaterial3d(materials.add(StandardMaterial{
+                base_color_texture:Some(planet_textures[planet_texture_number].clone()),
+                ..default()
+            })),
             Transform::from_xyz(
                 new_radius,
                 0.0,

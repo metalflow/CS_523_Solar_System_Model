@@ -4,6 +4,7 @@ use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy::{
     prelude::*,
+    //asset::LoadedFolder,
     //transform::TransformSystems,
 };
 
@@ -39,6 +40,7 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    //mut loaded_folders: Res<Assets<LoadedFolder>>,
 ) {
     // for keeping track of the "edge" of our solar system during creation
     let mut radius: u32=0;
@@ -58,11 +60,12 @@ fn setup(
         //&mut images,
         &mut materials,
         solar_system_center,
+        //&mut loaded_folders,
     );
 
     planet_file::make_planets (
         &mut commands,
-        //&asset_server,
+        &asset_server,
         &mut meshes,
         &mut images,
         &mut materials,
