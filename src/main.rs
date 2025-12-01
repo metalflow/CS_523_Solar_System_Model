@@ -42,9 +42,6 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     //mut loaded_folders: Res<Assets<LoadedFolder>>,
 ) {
-    // for keeping track of the "edge" of our solar system during creation
-    let mut radius: u32=0;
-
     let solar_system_center: Entity= commands.spawn(
         (Transform::from_xyz(
             0.0,
@@ -53,7 +50,7 @@ fn setup(
         ), Visibility::Inherited)
     ).id();
     
-    radius += sun_file::make_sun (
+    let solar_radius = sun_file::make_sun (
         &mut commands,
         &asset_server,
         &mut meshes,
@@ -63,14 +60,14 @@ fn setup(
         //&mut loaded_folders,
     );
 
-    planet_file::make_planets (
+    let system_radius = planet_file::make_planets (
         &mut commands,
         &asset_server,
         &mut meshes,
         &mut images,
         &mut materials,
         solar_system_center,
-        radius,
+        solar_radius,
     );
 
     /* Disabling Ground Plane
@@ -87,10 +84,15 @@ fn setup(
         Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
     ));
     */
-    commands.spawn((
+    let _camera = commands.spawn((
         Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
-        PanOrbitCamera::default(),
+        PanOrbitCamera{
+            zoom_lower_limit: solar_radius as f32+10.0,
+            zoom_upper_limit: Some((system_radius as f32)+10.0),
+            ..default()
+        }
     ));
+    
 
     #[cfg(not(target_arch = "wasm32"))]
     commands.spawn((
@@ -108,7 +110,8 @@ fn setup(
  it will pop the camera to an appropriate value, but when you resume moving,
  it pops back to the original bad value and moves relative to that.  There
  must be some stored value in the move/pan function that is still holding
- the bad value.  GitHub request added.
+ the bad value.  GitHub issue added.
+ https://github.com/Plonq/bevy_panorbit_camera/issues/133
 fn limit_pan_system(mut query: Query<&mut Transform, With <PanOrbitCamera>>) {
     for mut camera in query.iter_mut() {     
         const MIN: f32 = -100.0;
