@@ -16,6 +16,14 @@
 				"$rustc"
 			],
 			"label": "rust: cargo build --release"
+		},
+		{
+			"type": "cargo",
+			"command": "clippy",
+			"problemMatcher": [
+				"$rustc"
+			],
+			"label": "rust: cargo clippy"
 		}
 	]
 }

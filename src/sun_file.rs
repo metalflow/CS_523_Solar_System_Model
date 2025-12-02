@@ -47,9 +47,10 @@ pub fn make_sun(commands: &mut Commands,
     let texture_folder = loaded_folders.get(&texture_folder_handle).expect("Loaded folder not found");
     */
     /*pre-load assets into asset handler */
-    let mut sun_texture:Vec<Handle<Image>> = Vec::new();
-    sun_texture.push(asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg"))));
-    sun_texture.push(asset_server.load(texture_path.join(Path::new("8k_sun.jpg"))));
+    let sun_texture:Vec<Handle<Image>> = vec![
+        asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_sun.jpg"))),
+    ];
     //commands.insert_resource(MyTextureHandle(sun_texture));
 
     let sun_material = materials.add(StandardMaterial {
@@ -112,11 +113,12 @@ pub fn make_sun(commands: &mut Commands,
         },
         Transform::from_xyz(0.0, 0.0, 0.0),
     ));
-    return solar_radius;
+
+    solar_radius
 }
 
 pub fn animate_suns(mut query: Query<(&mut Transform, &Sun)>, time: Res<Time>) {
     for (mut transform, this_sun) in &mut query {
-        transform.rotate_y(time.delta_secs() * (this_sun.rotation_speed as f32));
+        transform.rotate_y(time.delta_secs() * this_sun.rotation_speed);
     }
 }

@@ -25,7 +25,7 @@ fn compute_orbital_speed(min:i8,max:i8) -> f32 {
     while output == 0.0 {
         output = PI * rng.random_range((min as f32)..=(max as f32))
     }
-    return output;
+    output
 }
 
 /// Creates a colorful test pattern
@@ -71,23 +71,24 @@ pub fn make_planets(commands: &mut Commands,
     let texture_path = Path::new("textures/planet/");
 
     /*pre-load assets into asset handler */
-    let mut planet_textures:Vec<Handle<Image>> = Vec::new();
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("2k_neptune.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("2k_uranus.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_ceres_fictional.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_eris_fictional.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_haumea_fictional.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_makemake_fictional.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("4k_venus_atmosphere.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_earth_clouds.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_earth_daymap.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_earth_nightmap.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_jupiter.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_mars.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_mercury.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_moon.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_saturn.jpg"))));
-    planet_textures.push(asset_server.load(texture_path.join(Path::new("8k_venus_surface.jpg"))));
+    let planet_textures:Vec<Handle<Image>> = vec![
+        asset_server.load(texture_path.join(Path::new("2k_neptune.jpg"))),
+        asset_server.load(texture_path.join(Path::new("2k_uranus.jpg"))),
+        asset_server.load(texture_path.join(Path::new("4k_ceres_fictional.jpg"))),
+        asset_server.load(texture_path.join(Path::new("4k_eris_fictional.jpg"))),
+        asset_server.load(texture_path.join(Path::new("4k_haumea_fictional.jpg"))),
+        asset_server.load(texture_path.join(Path::new("4k_makemake_fictional.jpg"))),
+        asset_server.load(texture_path.join(Path::new("4k_venus_atmosphere.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_earth_clouds.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_earth_daymap.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_earth_nightmap.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_jupiter.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_mars.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_mercury.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_moon.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_saturn.jpg"))),
+        asset_server.load(texture_path.join(Path::new("8k_venus_surface.jpg"))),
+    ];
 
     let _debug_material = materials.add(StandardMaterial {
         base_color_texture: Some(images.add(uv_debug_texture())),
@@ -141,18 +142,18 @@ pub fn make_planets(commands: &mut Commands,
         new_radius+=scaling_factor;
     }
 
-    return new_radius as u32;
+    new_radius as u32
 }
 
 pub fn animate_planets(mut query: Query<(&mut Transform, &Planet)>, time: Res<Time>) {
     for (mut transform, this_planet) in &mut query {
-        transform.rotate_y(time.delta_secs() * (this_planet.rotation_speed as f32));
+        transform.rotate_y(time.delta_secs() * this_planet.rotation_speed);
         transform.rotate_around(
             Vec3::new(
                     0.0,
                     0.0,
                     0.0,
                 ), 
-            Quat::from_rotation_y(time.delta_secs() * (this_planet.orbital_speed as f32)));
+            Quat::from_rotation_y(time.delta_secs() * this_planet.orbital_speed));
     }
 }
