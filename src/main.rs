@@ -1,15 +1,29 @@
+use std::path::{Path};
 
 #[cfg(not(target_arch = "wasm32"))]
 use bevy::pbr::wireframe::{WireframeConfig, WireframePlugin};
 use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy::{
     prelude::*,
-    //asset::LoadedFolder,
+    asset::LoadedFolder,
     //transform::TransformSystems,
 };
 
 mod sun_file;
 mod planet_file;
+
+//adding in AppStates to allow for assets to preload in a successul manner
+#[derive(States, Debug, Clone, PartialEq, Eq, Hash)]
+enum AppState {
+    PreLoad,
+    InGame,
+}
+
+//making a resource so that I don't have to keep lading the folder to get its handle
+#[derive(Resource)]
+struct AssetHandles {
+    texture_folder_handle: Handle<LoadedFolder>,
+}
 
 fn main() {
     App::new()
@@ -19,7 +33,10 @@ fn main() {
             WireframePlugin::default(),
             PanOrbitCameraPlugin,
         ))
-        .add_systems(Startup, setup)
+        .insert_state(AppState::PreLoad)
+        .add_systems(PreStartup, preload_assets)
+        .add_systems(Update, check_assets_loaded.run_if(in_state(AppState::PreLoad)))
+        .add_systems(OnEnter(AppState::InGame), setup)
         .add_systems(
             Update,
             (
@@ -28,7 +45,7 @@ fn main() {
                 #[cfg(not(target_arch = "wasm32"))]
                 toggle_wireframe,
                 //limit_pan_system, //disabled due to improper behavior
-            ),
+            ).run_if(in_state(AppState::InGame)),
         )
         //.add_systems(Update, limit_pan_system.after(TransformSystems::Propagate)) //disabled due to improper behavior
         .run();
@@ -130,5 +147,30 @@ fn toggle_wireframe(
 ) {
     if keyboard.just_pressed(KeyCode::Space) {
         wireframe_config.global = !wireframe_config.global;
+    }
+}
+
+fn preload_assets(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    let texture_path = Path::new("textures/");
+    let texture_folder_handle = asset_server.load_folder(texture_path);
+    //storing our handle in AssetHandles Resource so I don't have to keep recreting it
+    commands.insert_resource(AssetHandles { texture_folder_handle });
+}
+
+fn check_assets_loaded(
+    mut next_state: ResMut<NextState<AppState>>,
+    asset_server: Res<AssetServer>,
+    asset_handles: Res<AssetHandles>,
+) {
+    //let texture_path = Path::new("textures/");
+    //let texture_folder_handle = asset_server.load_folder(texture_path);
+    if asset_server.is_loaded_with_dependencies(asset_handles.texture_folder_handle.id()) {
+        info!("All assets loaded! Transitioning to InGame state.");
+        next_state.set(AppState::InGame);
+    } else {
+         println!("folder load state {:?}", asset_server.get_recursive_dependency_load_state(asset_handles.texture_folder_handle.id()));
     }
 }
