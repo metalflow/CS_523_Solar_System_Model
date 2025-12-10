@@ -9,7 +9,7 @@ use bevy::{
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
 
-/// new marker component for Planet Objects
+/// new component for Planet Objects
 #[derive(Component)]
 pub struct Planet {
     //should be a value from +2PI to -2PI

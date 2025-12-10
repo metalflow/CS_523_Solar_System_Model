@@ -1,7 +1,5 @@
 use std::path::{Path};
 use std::f32::consts::PI;
-//use std::time::Duration;
-//use std::{thread, time};
 use rand::{Rng, rng};
 
 ///bevy libraries
@@ -31,21 +29,7 @@ pub fn make_sun(commands: &mut Commands,
     let mut solar_radius: u32 = 0;
     let mut rng = rng();
     let texture_path = Path::new("textures/sun/");
-    /*
-    This experiment has failed, not because I couldn't get it working, but because load_folder takes WAY
-    longer than it should.  The while loop checking if the folder had loaded cycled more than 10 times before
-    I terminated the program.  I will be directly loading assets until I can figure out a better way to do this
-    //experiment with loading all textures
-    const ONE_SEC:Duration = time::Duration::from_millis(1000);
-    let texture_folder_handle = asset_server.load_folder(texture_path);
-    while asset_server.get_recursive_dependency_load_state(texture_folder_handle.id()).unwrap().is_loading() {
-        println!("folder load state {:?}", asset_server.get_recursive_dependency_load_state(texture_folder_handle.id()));
-        thread::sleep(ONE_SEC);
-        println!("...");
-    }
-    println!("folder load state {:?}", asset_server.get_recursive_dependency_load_state(texture_folder_handle.id()));
-    let texture_folder = loaded_folders.get(&texture_folder_handle).expect("Loaded folder not found");
-    */
+    
     /*pre-load assets into asset handler */
     let sun_texture:Vec<Handle<Image>> = vec![
         asset_server.load(texture_path.join(Path::new("Solarsystemscope_texture_2k_sun.jpg"))),
