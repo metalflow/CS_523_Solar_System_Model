@@ -7,6 +7,7 @@ use bevy::{
     prelude::*,
     asset::LoadedFolder,
     //transform::TransformSystems,
+    core_pipeline::Skybox,
 };
 
 mod sun_file;
@@ -87,20 +88,8 @@ fn setup(
         solar_radius,
     );
 
-    /* Disabling Ground Plane
-    // ground plane
-    commands.spawn((
-        Mesh3d(meshes.add(Plane3d::default().mesh().size(50.0, 50.0).subdivisions(10))),
-        MeshMaterial3d(materials.add(Color::from(SILVER))),
-    ));
-    */
-
-    /* replacing old camera with a movable camera
-    commands.spawn((
-        Camera3d::default(),
-        Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
-    ));
-    */
+    let skybox_texture_handle: Handle<Image>=asset_server.load(Path::new("textures/skybox/8k_milkyway.ktx2"));
+    
     let _camera = commands.spawn((
         Transform::from_xyz(10.0, 50., 0.0).looking_at(Vec3::new(0., 0., 0.), Vec3::Y),
         PanOrbitCamera{
@@ -108,7 +97,11 @@ fn setup(
             zoom_upper_limit: Some((system_radius as f32)+10.0),
             ..default()
         }
-    ));
+    )).insert(Skybox {
+            brightness: 1000.0,
+            image: skybox_texture_handle, // Use the stored handle
+            ..default()
+        });
     
 
     #[cfg(not(target_arch = "wasm32"))]
