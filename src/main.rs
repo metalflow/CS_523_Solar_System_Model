@@ -6,7 +6,6 @@ use bevy_panorbit_camera::{PanOrbitCamera, PanOrbitCameraPlugin};
 use bevy::{
     prelude::*,
     asset::LoadedFolder,
-    //transform::TransformSystems,
     core_pipeline::Skybox,
 };
 
@@ -45,10 +44,8 @@ fn main() {
                 planet_file::animate_planets,
                 #[cfg(not(target_arch = "wasm32"))]
                 toggle_wireframe,
-                //limit_pan_system, //disabled due to improper behavior
             ).run_if(in_state(AppState::InGame)),
         )
-        //.add_systems(Update, limit_pan_system.after(TransformSystems::Propagate)) //disabled due to improper behavior
         .run();
 }
 
@@ -58,7 +55,6 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut images: ResMut<Assets<Image>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    //mut loaded_folders: Res<Assets<LoadedFolder>>,
 ) {
     let solar_system_center: Entity= commands.spawn(
         (Transform::from_xyz(
@@ -72,10 +68,8 @@ fn setup(
         &mut commands,
         &asset_server,
         &mut meshes,
-        //&mut images,
         &mut materials,
         solar_system_center,
-        //&mut loaded_folders,
     );
 
     let system_radius = planet_file::make_planets (
@@ -116,23 +110,6 @@ fn setup(
     ));
 }
 
-/*This function doesn't appear to actually update the transform for the camera
- it will pop the camera to an appropriate value, but when you resume moving,
- it pops back to the original bad value and moves relative to that.  There
- must be some stored value in the move/pan function that is still holding
- the bad value.  GitHub issue added.
- https://github.com/Plonq/bevy_panorbit_camera/issues/133
-fn limit_pan_system(mut query: Query<&mut Transform, With <PanOrbitCamera>>) {
-    for mut camera in query.iter_mut() {     
-        const MIN: f32 = -100.0;
-        const MAX: f32 = 100.0;
-        camera.translation.x=camera.translation.x.clamp(MIN, MAX);
-        camera.translation.y=camera.translation.y.clamp(MIN, MAX);
-        camera.translation.z=camera.translation.z.clamp(MIN, MAX);
-    }
-}
-*/
-
 #[cfg(not(target_arch = "wasm32"))]
 fn toggle_wireframe(
     mut wireframe_config: ResMut<WireframeConfig>,
@@ -158,8 +135,6 @@ fn check_assets_loaded(
     asset_server: Res<AssetServer>,
     asset_handles: Res<AssetHandles>,
 ) {
-    //let texture_path = Path::new("textures/");
-    //let texture_folder_handle = asset_server.load_folder(texture_path);
     if asset_server.is_loaded_with_dependencies(asset_handles.texture_folder_handle.id()) {
         info!("All assets loaded! Transitioning to InGame state.");
         next_state.set(AppState::InGame);

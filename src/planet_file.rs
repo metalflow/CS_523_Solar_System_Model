@@ -115,7 +115,6 @@ pub fn make_planets(commands: &mut Commands,
         commands.spawn((
             ChildOf(solar_system_center),
             Mesh3d(shape),
-            //MeshMaterial3d(debug_material.clone()),
             MeshMaterial3d(materials.add(StandardMaterial{
                 base_color_texture:Some(planet_textures[planet_texture_number].clone()),
                 ..default()
